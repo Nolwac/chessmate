@@ -31,7 +31,6 @@ model Game {
   createdAt DateTime @default(now())
   completedAt DateTime? @updatedAt
   status Boolean  @default(false)// game hasn't completed by default
-  title     String   @db.VarChar(255)
   players Player[]
   gamePieces GamePiece[]
   winner Boolean?
