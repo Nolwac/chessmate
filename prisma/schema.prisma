@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Please create an environment variable for this in your version.
+}
+
+// Create the Player Schema
+model Player {
+  id        Int      @id @default(autoincrement())
+  joinedAt DateTime @default(now())
+  email     String?   @unique
+  name      String?
+  color     String
+  games     Game[]
+  gamePieces GamePiece[]
+}
+
+
+// Create the game schema
+model Game {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  completedAt DateTime? @updatedAt
+  status Boolean  @default(false)// game hasn't completed by default
+  title     String   @db.VarChar(255)
+  players Player[]
+  gamePieces GamePiece[]
+  winner Boolean?
+}
+
+model GamePiece {
+  id Int @id @default(autoincrement())
+  player Player @relation(fields: [playerId], references: [id])
+  playerId Int
+  moves Move[]
+  inBoard Boolean @default(true)
+  numberOfCaptures Int @default(0)
+  pieceType Role
+  game Game @relation(fields: [gameId], references: [id])
+  gameId Int
+}
+
+model Move {
+  id Int @id @default(autoincrement())
+  piece GamePiece @relation(fields: [pieceId], references: [id])
+  pieceId Int
+  fromPosition Int[]
+  toPosition Int[]
+  timestamp DateTime @default(now())
+}
+
+enum Role {
+  QUEEN
+  KING
+  PAWN
+  ROOK
+  BISHOP
+  NIGHT
+}
